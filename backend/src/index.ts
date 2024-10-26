@@ -20,20 +20,17 @@ interface UpdateUserRequest {
 }
 
 // Create a new user
-app.post(
-  "/users",
-  async (req: Request<{}, {}, CreateUserRequest>, res: Response) => {
-    const { name, email } = req.body;
-    try {
-      const user: User = await prisma.user.create({
-        data: { name, email },
-      });
-      res.status(201).json(user);
-    } catch (error) {
-      res.status(500).json({ error: "Error creating user" });
-    }
+app.post("/users", async (req: Request<CreateUserRequest>, res: Response) => {
+  const { name, email } = req.body;
+  try {
+    const user: User = await prisma.user.create({
+      data: { name, email },
+    });
+    res.status(201).json(user);
+  } catch (error) {
+    res.status(500).json({ error: "Error creating user" + error });
   }
-);
+});
 
 // Get all users
 app.get("/users", async (req: Request, res: Response) => {
@@ -41,7 +38,7 @@ app.get("/users", async (req: Request, res: Response) => {
     const users: User[] = await prisma.user.findMany();
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ error: "Error fetching users" });
+    res.status(500).json({ error: "Error fetching users" + error });
   }
 });
 
@@ -58,17 +55,14 @@ app.get("/users/:id", async (req: Request<{ id: string }>, res: Response) => {
       res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Error fetching user" });
+    res.status(500).json({ error: "Error fetching user" + error });
   }
 });
 
 // Update a user by ID
 app.put(
   "/users/:id",
-  async (
-    req: Request<{ id: string }, {}, UpdateUserRequest>,
-    res: Response
-  ) => {
+  async (req: Request<{ id: string }, UpdateUserRequest>, res: Response) => {
     const { id } = req.params;
     const { name, email } = req.body;
     try {
@@ -78,7 +72,7 @@ app.put(
       });
       res.status(200).json(user);
     } catch (error) {
-      res.status(500).json({ error: "Error updating user" });
+      res.status(500).json({ error: "Error updating user" + error });
     }
   }
 );
@@ -94,7 +88,7 @@ app.delete(
       });
       res.status(204).end();
     } catch (error) {
-      res.status(500).json({ error: "Error deleting user" });
+      res.status(500).json({ error: "Error deleting user" + error });
     }
   }
 );
